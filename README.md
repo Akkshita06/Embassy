@@ -1,9 +1,7 @@
 <div align="center">
-  <img src="https://api.iconify.design/ph:seal-check-duotone.svg?color=%23c9a15c" width="64" height="64" alt="" />
+  <a href="#"><img src=".github/assets/embassy-logo.png" width="180" alt="Embassy" /></a>
 
-  # Embassy
-
-  ### The border control for agentic commerce.
+  <sup><i>The border control for agentic commerce.</i></sup>
 
   AI agents present credentials, not just requests — Embassy decides who spends, how much, and who has to sign off.
 
@@ -15,11 +13,13 @@
   </p>
 
   <p>
-    <img alt="Next.js" src="https://img.shields.io/badge/Next.js-16-000000?style=flat-square&logo=next.js&logoColor=white">
-    <img alt="React" src="https://img.shields.io/badge/React-19-149ECA?style=flat-square&logo=react&logoColor=white">
-    <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white">
-    <img alt="Tailwind" src="https://img.shields.io/badge/Tailwind-v4-38BDF8?style=flat-square&logo=tailwindcss&logoColor=white">
-    <img alt="License" src="https://img.shields.io/badge/license-unspecified-lightgrey?style=flat-square">
+    <img alt="Next.js" src="https://img.shields.io/badge/Next.js-16-0B0B0B?style=for-the-badge&logo=next.js&logoColor=F5EDE0">
+    <img alt="React" src="https://img.shields.io/badge/React-19-0B0B0B?style=for-the-badge&logo=react&logoColor=EC9A72">
+    <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5-0B0B0B?style=for-the-badge&logo=typescript&logoColor=EC9A72">
+    <img alt="Tailwind" src="https://img.shields.io/badge/Tailwind-v4-0B0B0B?style=for-the-badge&logo=tailwindcss&logoColor=F5EDE0">
+  </p>
+  <p>
+    <img alt="License" src="https://img.shields.io/badge/license-unspecified-0B0B0B?style=for-the-badge&labelColor=0B0B0B&color=2A2A2A">
   </p>
 </div>
 
@@ -337,5 +337,7 @@ Built as a demonstration of policy-gated, auditable agentic commerce.
 **_Add your name_** · _Add your email or website_ · _Add your GitHub_
 
 <div align="center">
-<sub>Every agent needs a mandate before it crosses the border.</sub>
+  <img src=".github/assets/embassy-logo.png" width="40" alt="" />
+  <br />
+  <sub>Every agent needs a mandate before it crosses the border.</sub>
 </div>
