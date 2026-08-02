@@ -6,9 +6,9 @@ import { Copy, Check, Moon, Sun } from "lucide-react";
 import { Panel } from "@/components/panel";
 
 const keys = [
-  { label: "Prava API Key", value: "prava_live_9f2b7c1a8e4d6f3210" },
-  { label: "Linq API Key", value: "linq_live_3e8a1d5c7b902f4461" },
-  { label: "Shopify Access Token", value: "shpat_a41c9e2f6d8b30175c" },
+  { label: "Prava API Key", value: "prava_liveXXXXXXXXXXXXXX" },
+  { label: "Linq API Key", value: "linq_live_XXXXXXXXXXXXXXXX" },
+  { label: "Shopify Access Token", value: "shpat_XXXXXXXXXXXXXXX" },
 ];
 
 function KeyRow({ label, value }: { label: string; value: string }) {
