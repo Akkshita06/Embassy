@@ -1,5 +1,5 @@
 <div align="center">
-  <a href="#"><img src=".github/assets/embassy-logo.png" width="180" alt="Embassy" /></a>
+  <img src=".github/assets/embassy-logo.png" width="180" alt="Embassy" />
 
   <sup><i>The border control for agentic commerce.</i></sup>
 
