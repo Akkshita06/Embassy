@@ -109,9 +109,15 @@ function getFromNumber(): string {
 /* Linq HTTPS request helper                                                  */
 /* -------------------------------------------------------------------------- */
 
+interface LinqFetchInit {
+  method?: string;
+  body?: string;
+  headers?: Record<string, string>;
+}
+
 async function linqFetch<TResponse>(
   path: string,
-  init: RequestInit
+  init: LinqFetchInit
 ): Promise<TResponse> {
   const apiKey = getApiKey();
   const requestUrl = new URL(`${LINQ_API_BASE}${path}`);
