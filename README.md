@@ -1,5 +1,5 @@
 <div align="center">
-  <img src=".github/assets/embassy-logo.png" width="160" alt="Embassy" />
+  <img src="embassy-logo.png" width="160" alt="Embassy" />
 
   <sup><i>The border control for agentic commerce.</i></sup>
 
@@ -394,7 +394,7 @@ Built as a demonstration of policy-gated, auditable agentic commerce, for the fo
 **_Add your name_** · _Add your email or website_ · _Add your GitHub_
 
 <div align="center">
-  <img src=".github/assets/embassy-logo.png" width="36" alt="" />
+  <img src="embassy-logo.png" width="36" alt="" />
   <br />
   <sub>Every agent needs a mandate before it crosses the border.</sub>
 </div>
