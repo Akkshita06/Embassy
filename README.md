@@ -1,128 +1,132 @@
 <div align="center">
+  <img src="https://api.iconify.design/ph:seal-check-duotone.svg?color=%23c9a15c" width="64" height="64" alt="" />
 
-# Embassy
+  # Embassy
 
-**The trust and policy layer for agentic commerce — the border control where AI agents present mandates before they're allowed to spend.**
+  ### The border control for agentic commerce.
 
-[![Next.js](https://img.shields.io/badge/Next.js-16.2-000000?logo=next.js&logoColor=white)](https://nextjs.org)
-[![React](https://img.shields.io/badge/React-19.2-149ECA?logo=react&logoColor=white)](https://react.dev)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
-[![License](https://img.shields.io/badge/license-unspecified-lightgrey)](#license)
+  AI agents present credentials, not just requests — Embassy decides who spends, how much, and who has to sign off.
 
+  <p>
+    <a href="#quickstart"><strong>Quickstart</strong></a> ·
+    <a href="#architecture"><strong>Architecture</strong></a> ·
+    <a href="#api-routes"><strong>API</strong></a> ·
+    <a href="#roadmap"><strong>Roadmap</strong></a>
+  </p>
+
+  <p>
+    <img alt="Next.js" src="https://img.shields.io/badge/Next.js-16-000000?style=flat-square&logo=next.js&logoColor=white">
+    <img alt="React" src="https://img.shields.io/badge/React-19-149ECA?style=flat-square&logo=react&logoColor=white">
+    <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white">
+    <img alt="Tailwind" src="https://img.shields.io/badge/Tailwind-v4-38BDF8?style=flat-square&logo=tailwindcss&logoColor=white">
+    <img alt="License" src="https://img.shields.io/badge/license-unspecified-lightgrey?style=flat-square">
+  </p>
 </div>
 
----
+<br />
 
-## Table of Contents
+```
+  ┌─────────────────────────────────────────────────────────────────┐
+  │  Agent: "Restock office mice from Amazon — ₹4,200"               │
+  │                                                                   │
+  │   ✓ Agent Reasoning        ordinary, well-justified restock       │
+  │   ✓ Nanda Orchestration    identity verified                      │
+  │   ✓ Policy Evaluation      in scope · under daily cap             │
+  │   ✓ Prava Mandate Check    card on file                           │
+  │   ✓ Senso Policy Context   no conflicting policy found            │
+  │   ✓ Human Approval         not needed — executed automatically    │
+  │                                                                   │
+  │  → APPROVED · 340ms                                                │
+  └─────────────────────────────────────────────────────────────────┘
+```
 
-- [Overview](#overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Architecture](#architecture)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Configuration](#configuration)
-- [Screenshots](#screenshots)
-- [API Routes](#api-routes)
-- [Components](#components)
-- [Performance Considerations](#performance-considerations)
-- [Security](#security)
-- [Development](#development)
-- [Deployment](#deployment)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
-- [License](#license)
-- [Author](#author)
+## Why this exists
 
----
+Every "agentic commerce" demo you've seen solves *checkout* — an agent finds a card, fills a form, completes a purchase. None of them solve *governance*: what is this agent actually allowed to buy, with whose money, up to what limit, and who finds out when it goes over?
 
-## Overview
+That gap is where the money is lost, or where a company simply refuses to let agents touch a card at all.
 
-AI agents are starting to make real purchases on behalf of people and businesses — booking travel, restocking supplies, renewing subscriptions — but there's no standard way to answer the question every finance team asks the moment that happens: **"was this agent allowed to spend this money?"**
+Embassy is a policy-decision and audit layer that sits between an agent's purchase request and the money moving. Every request is checked against a **mandate** — a scoped policy with a merchant allow-list or category, a per-charge limit, and a daily cap — and produces a deterministic **approve / escalate / deny** verdict, with a full, readable trail of *why*. In-policy requests execute immediately. Out-of-policy requests get routed to a human — over iMessage, if you wire it up — before a rupee moves.
 
-Embassy is a policy-decision and audit layer that sits between an AI agent's purchase request and the money actually moving. Every request is evaluated against a **mandate** (a scoped spending policy — merchant allow-list or category, per-charge limit, daily cap) and produces a deterministic **allow / escalate / deny** decision, along with a full, human-readable decision trail explaining *why*. Requests that fall within policy execute automatically; requests that don't are routed to a human for approval — over iMessage, if configured — before anything is charged.
-
-It exists because "agentic commerce" tooling today is almost entirely about *making* the purchase (checkout automation, card issuing) and has little to say about *governing* it. Embassy is the missing control plane: a single, auditable place where spend policy is defined, evaluated, and logged, independent of which agent framework or payment rail is doing the actual buying.
-
-**Target users:** teams building or operating AI agents that need to spend money — engineering teams prototyping agentic checkout, finance/ops teams who need an audit trail and human-in-the-loop guardrails, and hackathon/demo builders who want a working example of policy-gated agent commerce.
+If you're building agents that spend money, or you're the person who has to explain to finance why an agent spent money, Embassy is the missing piece between the two of you.
 
 ## Features
 
-- 🛂 **Deterministic policy engine** — a single, side-effect-free function (`runPolicyEvaluation`) is the *only* thing that decides allow / escalate / deny. Nothing else in the request pipeline — not the LLM, not agent identity checks — can silently influence that verdict.
-- 🧠 **LLM-based intent extraction** — free-text purchase requests are parsed into structured fields (reason, category, item, merchant, budget ceiling, risk flags) via an OpenAI-compatible chat completion, used only for *display*, never for the decision itself.
-- 📜 **Mandates** — scoped spending policies with merchant allow-lists, category matching, per-charge limits, daily caps, pause/resume, and linked payment cards.
-- 🪪 **Agent identity resolution** — originating agents are resolved against a Nanda-style registry before a request can auto-approve; unverified identity forces escalation.
-- 🔎 **Grounded policy context** — optional Senso knowledge-base lookups surface relevant policy text alongside a decision for human reviewers (purely advisory — cannot itself change a verdict).
-- 💳 **Real card-linking sessions** — Prava-hosted, embeddable sessions for card-on-file enrollment, including an over-cap re-authorization flow for spend above a mandate's normal limit.
-- 📲 **Human approval over iMessage** — escalated requests can send an interactive approval card to the mandate holder's phone via the Linq Partner API, with signed webhook callbacks carrying the decision back.
-- 🧾 **Full decision timeline** — every request produces an ordered, step-by-step audit trail (Agent Request → Nanda → Policy Evaluation → Prava Mandate Check → Senso Context → Human Approval) rendered in the workspace UI.
-- 🖥️ **Full workspace UI** — purchase requests, mandates, approval center, audit ledger, calendar, tasks, agent activity, and team views, plus a public marketing site, live interactive demo, architecture explainer, and analytics dashboard.
-- 🎛️ **Provider fallback for the LLM step** — defaults to Groq (free tier, OpenAI-compatible), with automatic fallback to a secondary model and an OpenAI code path if `OPENAI_API_KEY` is supplied instead.
+| | |
+|---|---|
+| 🛂 **Deterministic policy engine** | One pure function, `runPolicyEvaluation`, is the *only* code path that can produce a verdict. The LLM, identity checks, and knowledge-base lookups all feed it as inputs — none of them can override it. |
+| 🧠 **LLM intent extraction** | Free-text requests are parsed into structured fields (reason, category, item, budget ceiling, risk flags) for the audit trail — display only, never a decision input. |
+| 📜 **Mandates** | Merchant allow-lists or category scoping, per-charge limits, daily caps, pause/resume, linked cards. |
+| 🪪 **Agent identity resolution** | Requests from an unverified agent (per a Nanda-style registry) are forced to escalate — no silent auto-approval. |
+| 🔎 **Grounded policy context** | Optional Senso knowledge-base lookups surface relevant policy text for human reviewers. Advisory only — cannot flip a verdict. |
+| 💳 **Real card-linking** | Prava-hosted embeddable sessions for card enrollment, plus an over-cap re-authorization flow for spend above a mandate's normal ceiling. |
+| 📲 **Human approval, over iMessage** | Escalated requests can push an interactive approval card via the Linq Partner API, with a signed webhook carrying the decision back. |
+| 🧾 **Full decision timeline** | Every request renders its complete pipeline trail — Agent Request → Nanda → Policy → Prava → Senso → Human Approval — pass, fail, or skipped. |
+| 🖥️ **Full workspace** | Requests, mandates, approval center, audit ledger, calendar, tasks, agent activity, team — plus a marketing site, guided demo, architecture explainer, and analytics. |
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Framework | [Next.js 16](https://nextjs.org) (App Router, Turbopack dev server) |
-| UI Library | [React 19](https://react.dev) |
-| Language | [TypeScript 5](https://www.typescriptlang.org) |
-| Styling | [Tailwind CSS v4](https://tailwindcss.com) (via `@tailwindcss/postcss`), custom CSS design tokens |
-| Animation | [Framer Motion](https://www.framer.com/motion/) |
-| Charts | [Recharts](https://recharts.org) |
-| Icons | [Lucide](https://lucide.dev) |
-| LLM / Intent Extraction | [Groq](https://groq.com) (default, OpenAI-compatible) or [OpenAI](https://platform.openai.com), via the `openai` SDK |
-| Card-linking / Payments | [Prava](https://prava.space) embedded sessions (`@prava-sdk/core`) |
-| Agent Identity | Nanda-style agent registry (stubbed client, real-contract-ready) |
-| Knowledge / Policy Grounding | [Senso](https://senso.ai) grounded search API |
-| Human Approval Channel | [Linq](https://linqapp.com) Partner API (iMessage cards + Standard Webhooks) |
-| Utilities | `clsx`, `tailwind-merge`, `dotenv` |
-| Tooling | ESLint 9 (`eslint-config-next`), `tsx` (ingestion script runner) |
+<table>
+<tr><td><b>Framework</b></td><td>Next.js 16 (App Router, Turbopack)</td></tr>
+<tr><td><b>UI</b></td><td>React 19, TypeScript 5</td></tr>
+<tr><td><b>Styling</b></td><td>Tailwind CSS v4, custom design tokens</td></tr>
+<tr><td><b>Animation</b></td><td>Framer Motion</td></tr>
+<tr><td><b>Charts</b></td><td>Recharts</td></tr>
+<tr><td><b>Icons</b></td><td>Lucide</td></tr>
+<tr><td><b>LLM</b></td><td>Groq (default, OpenAI-compatible) or OpenAI, via the <code>openai</code> SDK</td></tr>
+<tr><td><b>Payments</b></td><td>Prava embedded card-link sessions (<code>@prava-sdk/core</code>)</td></tr>
+<tr><td><b>Agent identity</b></td><td>Nanda-style registry (stubbed, real-contract-ready)</td></tr>
+<tr><td><b>Knowledge / grounding</b></td><td>Senso grounded search API</td></tr>
+<tr><td><b>Human approval channel</b></td><td>Linq Partner API — iMessage cards, Standard Webhooks</td></tr>
+<tr><td><b>Tooling</b></td><td>ESLint 9, <code>tsx</code>, <code>dotenv</code>, <code>clsx</code> + <code>tailwind-merge</code></td></tr>
+</table>
 
 ## Architecture
 
-### Request flow
-
 ```
-Purchase request (form / API)
-        │
-        ▼
- extractIntent()  ──────────────► Groq / OpenAI chat completion
-   (agent/reason.ts)               (structures text; never decides)
-        │
-        ▼
- resolveAgent()  ───────────────► Nanda registry (stub or real)
-   (nanda/client.ts)               verifies originating agent identity
-        │
-        ▼
- sensoSearch()  ────────────────► Senso grounded search (advisory only)
-   (senso/client.ts)
-        │
-        ▼
- runPolicyEvaluation() ◄───────── mandate (client-held state)
-   (policy/engine.ts)              THE decision: approved / escalated / blocked
-        │
-        ├── approved  → executes, no human step
-        │
-        └── escalated → sendApprovalMessage() ──► Linq (iMessage approval card)
-                                                          │
-                                              signed Standard Webhook
-                                                          ▼
-                                              verifyLinqWebhookSignature()
-                                              (approve/deny decision received)
+ Purchase request (form / API)
+          │
+          ▼
+ extractIntent() ─────────────► Groq / OpenAI chat completion
+   agent/reason.ts               structures text — never decides
+          │
+          ▼
+ resolveAgent() ──────────────► Nanda registry (stub or real)
+   nanda/client.ts                verifies originating agent identity
+          │
+          ▼
+ sensoSearch() ───────────────► Senso grounded search — advisory only
+   senso/client.ts
+          │
+          ▼
+ runPolicyEvaluation() ◄──────── mandate (client-held state)
+   policy/engine.ts               THE decision: approved / escalated / blocked
+          │
+          ├── approved  → executes, no human step
+          │
+          └── escalated → sendApprovalMessage() ──► Linq iMessage card
+                                                            │
+                                                signed Standard Webhook
+                                                            ▼
+                                                verifyLinqWebhookSignature()
 ```
 
-Every stage appends a `DecisionStep` to an ordered `decisionPath` array, so the UI can render the exact reasoning — pass, fail, or skip — for each pipeline stage, even for requests that were blocked before reaching later stages.
+Every stage appends a `DecisionStep` to an ordered `decisionPath`, so the UI can render pass / fail / skipped for each pipeline stage — including stages never reached because an earlier one blocked the request.
 
-### Design decisions worth knowing
+<details>
+<summary><b>Design decisions worth knowing</b></summary>
+<br>
 
-- **The policy engine is the single source of truth.** `runPolicyEvaluation` in `src/lib/policy/engine.ts` is a pure function: identity verification, LLM output, and knowledge-base context all feed *into* it as inputs, but only its own deterministic rules (mandate scope, per-charge limit, daily cap, card-link status) can produce the allow/escalate/deny verdict.
-- **LLM output never gates a decision.** `extractIntent()` produces descriptive text and risk flags for the audit trail only; the policy engine never branches on anything the model returns.
-- **No database.** This is a stateless demo app — `src/lib/mock-data.ts` seeds mandates and transactions, and the requests page owns `spentToday` in React state for the duration of a session. A production deployment would replace this with persistent storage.
-- **Stubs are explicitly labeled.** Nanda's client (`src/lib/nanda/client.ts`) is a documented stub (no public API docs were available at build time) — every value it returns is tagged `source: "stub"` so it's never confused with a live integration. Senso and Linq are real, documented integrations.
-- **Secrets never reach the client.** Every third-party call (Prava, Linq, Nanda, Senso, Groq/OpenAI) happens inside `server-only`-marked modules and Next.js Route Handlers; API routes return only the derived result.
+- **The policy engine is the single source of truth.** `runPolicyEvaluation` in `src/lib/policy/engine.ts` is a pure function: identity verification, LLM output, and knowledge-base context are inputs, never gates. Only mandate scope, per-charge/daily limits, and card-link status can produce a verdict.
+- **LLM output never gates a decision.** `extractIntent()` produces descriptive text and risk flags for the audit trail; the policy engine never branches on anything the model returns.
+- **No database.** This is a stateless demo — `src/lib/mock-data.ts` seeds mandates/transactions, and `spentToday` lives in React state for the session. Swap in persistent storage for production use.
+- **Stubs are explicitly labeled.** `src/lib/nanda/client.ts` is a documented stub (no public Nanda API docs were available) — every value it returns carries `source: "stub"` so it's never mistaken for a live integration. Senso and Linq are real, documented integrations.
+- **Secrets never reach the client.** Every third-party call is wrapped in `server-only` modules and Route Handlers; API routes return only the derived result.
 
-### Folder structure
+</details>
+
+<details>
+<summary><b>Folder structure</b></summary>
 
 ```
 embassy/
@@ -130,14 +134,12 @@ embassy/
 │   ├── app/
 │   │   ├── page.tsx                    # Public marketing landing page
 │   │   ├── layout.tsx                  # Root layout, metadata, site chrome
-│   │   ├── demo/                       # Interactive step-by-step product demo
+│   │   ├── demo/                       # Interactive guided product demo
 │   │   ├── architecture/               # In-app architecture explainer
 │   │   ├── analytics/                  # Analytics dashboard
 │   │   ├── history/                    # Transaction history
 │   │   ├── settings/                   # Global settings
 │   │   ├── workspace/                  # Authenticated-style app shell
-│   │   │   ├── layout.tsx              #   Sidebar + workspace chrome
-│   │   │   ├── page.tsx                #   Workspace overview
 │   │   │   ├── requests/               #   Purchase request submission & review
 │   │   │   ├── mandates/               #   Mandate management
 │   │   │   ├── approvals/              #   Human approval center
@@ -145,201 +147,195 @@ embassy/
 │   │   │   ├── calendar/               #   Calendar view
 │   │   │   ├── tasks/                  #   Task board
 │   │   │   ├── agents/                 #   Agent activity feed
-│   │   │   ├── team/                   #   Team / workspace settings
-│   │   │   └── settings/               #   Workspace-scoped settings
+│   │   │   └── team/                   #   Team / workspace settings
 │   │   └── api/
 │   │       ├── agent/reason/           # POST — LLM intent extraction
-│   │       ├── requests/evaluate/      # POST — full orchestration + policy decision
+│   │       ├── requests/evaluate/      # POST — full orchestration + decision
 │   │       ├── nanda/resolve/          # POST — agent identity resolution (stub)
 │   │       ├── nanda/register-agent/   # POST — agent registration (stub)
 │   │       ├── prava/session/          # POST — create card-link session
 │   │       ├── prava/session/[id]/revoke/  # POST — revoke a session
-│   │       ├── prava/over-cap-session/ # POST — over-cap re-authorization session
+│   │       ├── prava/over-cap-session/ # POST — over-cap re-authorization
 │   │       ├── linq/send-approval/     # POST — send iMessage approval card
-│   │       └── linq/webhook/           # POST — receive signed Linq webhook events
-│   ├── components/                     # Shared UI (nav, panels, charts, demo steps…)
-│   │   └── workspace/                  # Workspace-specific components
+│   │       └── linq/webhook/           # POST — receive signed Linq events
+│   ├── components/                     # Shared UI + workspace/ + demo/
 │   └── lib/
 │       ├── policy/engine.ts            # The deterministic decision engine
 │       ├── agent/reason.ts             # LLM intent extraction (Groq/OpenAI)
 │       ├── nanda/client.ts             # Agent identity registry (stub)
 │       ├── senso/client.ts             # Grounded knowledge-base search
 │       ├── prava/session.ts            # Card-linking session client
-│       ├── prava/collect-pan.ts        # Card collection helpers
 │       ├── linq/client.ts              # iMessage approval-card client
-│       ├── linq/webhook.ts             # Standard Webhooks signature verification
-│       ├── mock-data.ts                # Seed mandates/transactions + types
-│       └── utils.ts                    # Formatting helpers (INR currency, dates)
-├── scripts/
-│   └── senso-ingest.ts                 # CLI script to ingest docs into Senso's KB
+│       ├── linq/webhook.ts             # Standard Webhooks verification
+│       └── mock-data.ts                # Seed data + shared types
+├── scripts/senso-ingest.ts             # CLI: ingest docs into Senso's KB
 └── public/                             # Static assets
 ```
 
-## Installation
+</details>
 
-**Prerequisites:** Node.js 20+ and npm.
+## Quickstart
 
 ```bash
 git clone <repository-url>
 cd embassy
 npm install
-```
-
-Create a `.env.local` file in the project root (see [Configuration](#configuration) for details on each variable):
-
-```bash
-cp .env.example .env.local
-# then fill in your own keys
-```
-
-Start the development server (Turbopack):
-
-```bash
+cp .env.example .env.local   # then fill in your own keys — see Configuration
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-> An `.env.example` is included below for reference — generate your own `.env.local` from it rather than committing real keys.
+Open **http://localhost:3000**. No keys? Head straight to `/demo` — it's fully seeded and needs nothing configured.
 
 ## Usage
 
-1. **Land on the marketing page** (`/`) for an overview of the product, or jump straight into `/demo` for a guided, animated walkthrough of the full decision pipeline (chat → reasoning → policy → approval → execution → receipt) using seeded data — no keys required.
-2. **Enter the workspace** (`/workspace`) to work with real state:
-   - Create or edit **mandates** (`/workspace/mandates`) — set merchant allow-lists or a category, a per-charge limit, and a daily cap, and link a card via the embedded Prava session.
-   - Submit a **purchase request** (`/workspace/requests`) as free text or structured fields; it's routed through intent extraction, identity resolution, and the policy engine in real time.
-   - Review **escalated requests** in the **Approval Center** (`/workspace/approvals`) — approve or deny, optionally pushed out as an iMessage card via Linq.
-   - Inspect the full **audit ledger** (`/workspace/ledger`) and each request's step-by-step decision trail.
-3. **Review architecture** (`/architecture`) for an in-app, visual explanation of how the pipeline fits together, and **analytics** (`/analytics`) for aggregate approval-rate and spend metrics.
+- **`/`** — marketing overview.
+- **`/demo`** — guided, animated walkthrough of the full pipeline (chat → reasoning → policy → approval → execution → receipt) on seeded data. No keys required.
+- **`/workspace/mandates`** — create mandates: merchant allow-list or category, per-charge limit, daily cap, and a linked card via embedded Prava session.
+- **`/workspace/requests`** — submit a purchase request (free text or structured) and watch it move through intent extraction, identity resolution, and the policy engine in real time.
+- **`/workspace/approvals`** — review and act on escalated requests, optionally pushed to a phone as an iMessage card.
+- **`/workspace/ledger`** — the full audit trail, per request.
+- **`/architecture`** and **`/analytics`** — in-app pipeline explainer and aggregate metrics.
 
 ## Configuration
 
-All server-side integrations are configured via environment variables in `.env.local`.
+> [!NOTE]
+> Nothing requires *every* key. Omit an integration's credentials and that pipeline step degrades gracefully (Senso context, Nanda verification) or fails with a clear, explicit error (Prava, the LLM step) — it never fails silently into a wrong decision.
 
-| Variable | Required | Description | Example |
-|---|---|---|---|
-| `PRAVA_SECRET_KEY` | Yes, for card-linking | Server-side secret key for creating Prava card-link sessions. | `sk_test_...` |
-| `NEXT_PUBLIC_PRAVA_PUBLISHABLE_KEY` | Yes, for card-linking | Client-side publishable key used to mount the Prava embedded iframe. | `pk_test_...` |
-| `NEXT_PUBLIC_APP_URL` | Yes | Public base URL of the deployed app (used for redirect/callback URLs). | `https://your-app.example.com` |
-| `GROQ_API_KEY` | Recommended | API key for Groq's OpenAI-compatible chat completions — the default LLM provider for intent extraction (free tier, no card required). | `gsk_...` |
-| `GROQ_MODEL` | No | Overrides the default Groq model (`llama-3.3-70b-versatile`). | `llama-3.3-70b-versatile` |
-| `OPENAI_API_KEY` | No | Fallback LLM provider if `GROQ_API_KEY` is not set. | `sk-...` |
-| `SENSO_API_KEY` | Optional | API key for Senso's grounded knowledge-base search (`X-API-Key` header). Without it, the Senso pipeline step is simply skipped. | `tgr_...` |
-| `SENSO_API_BASE` | No | Overrides the default Senso API base URL. | `https://apiv2.senso.ai/api/v1` |
-| `NANDA_API_KEY` | Optional | Key for the Nanda agent-identity registry. **Note:** the client is a documented stub pending public Nanda API docs — see `src/lib/nanda/client.ts`. | `stub_replace_me` |
-| `NANDA_REGISTRY_URL` | No | Overrides the default (stub) Nanda registry base URL. | `https://registry.nanda.example/v1` |
-| `LINQ_API_KEY` | Optional | Bearer token for the Linq Partner API, used to send iMessage approval cards. | `f7b73804-...` |
-| `LINQ_WEBHOOK_SECRET` | Optional | Standard Webhooks signing secret configured on your Linq webhook endpoint; required to verify inbound approval decisions. | `whsec_...` |
-| `LINQ_FROM_NUMBER` | Optional | The Linq-provisioned phone number approval cards are sent from (E.164). | `+14045550100` |
-| `LINQ_APPROVER_PHONE` | Optional | Default mandate-holder phone number that receives approval cards (E.164). | `+919667500000` |
+<details open>
+<summary><b>Environment variables</b></summary>
+<br>
 
-An `.env.example` is not currently checked into the repository; use the table above as the template for your own `.env.local`. None of the workspace UI, demo, or analytics pages require every key — omit an integration's keys to have that pipeline step skip gracefully (Senso context, Nanda verification) or fail explicitly with a clear error (Prava, the LLM step).
+| Variable | Required | Description |
+|---|:---:|---|
+| `PRAVA_SECRET_KEY` | ✅ | Server-side secret for creating Prava card-link sessions. |
+| `NEXT_PUBLIC_PRAVA_PUBLISHABLE_KEY` | ✅ | Client-side key that mounts the Prava embedded iframe. |
+| `NEXT_PUBLIC_APP_URL` | ✅ | Public base URL of the deployment (redirect/callback URLs). |
+| `GROQ_API_KEY` | Recommended | Default LLM provider for intent extraction — Groq's free tier, OpenAI-compatible. |
+| `GROQ_MODEL` | – | Override the default Groq model (`llama-3.3-70b-versatile`). |
+| `OPENAI_API_KEY` | – | Fallback LLM provider if `GROQ_API_KEY` isn't set. |
+| `SENSO_API_KEY` | Optional | Senso grounded search (`X-API-Key` auth). Step is skipped without it. |
+| `SENSO_API_BASE` | – | Override the default Senso API base URL. |
+| `NANDA_API_KEY` | Optional | Nanda agent registry key. **Client is a documented stub** — see `src/lib/nanda/client.ts`. |
+| `NANDA_REGISTRY_URL` | – | Override the default (stub) registry base URL. |
+| `LINQ_API_KEY` | Optional | Bearer token for the Linq Partner API (iMessage approval cards). |
+| `LINQ_WEBHOOK_SECRET` | Optional | Standard Webhooks signing secret for verifying inbound decisions. |
+| `LINQ_FROM_NUMBER` | Optional | Linq-provisioned sender number, E.164. |
+| `LINQ_APPROVER_PHONE` | Optional | Default mandate-holder number that receives approval cards, E.164. |
+
+</details>
+
+> [!WARNING]
+> An `.env.example` isn't currently checked into the repo — use the table above as your template, and never commit real keys in `.env.local` (it's already git-ignored).
 
 ## Screenshots
 
 | Landing Page | Workspace Overview |
 |---|---|
-| Add screenshot | Add screenshot |
+| _Add screenshot_ | _Add screenshot_ |
 
 | Purchase Request Flow | Approval Center |
 |---|---|
-| Add screenshot | Add screenshot |
+| _Add screenshot_ | _Add screenshot_ |
 
 ## API Routes
 
-All routes are Next.js Route Handlers under `src/app/api/`. Every route is server-only; no upstream secret is ever returned to the client.
+<details open>
+<summary><b>All routes</b> — server-only, no upstream secret ever returned to the client</summary>
+<br>
 
 | Method | Endpoint | Purpose |
 |---|---|---|
-| `POST` | `/api/agent/reason` | Extracts structured purchase intent (reason, category, risk flags, budget ceiling) from free text via Groq/OpenAI. Informational only. |
-| `POST` | `/api/requests/evaluate` | Full orchestration: intent extraction → Nanda identity resolution → Senso context → `runPolicyEvaluation`. Returns the final decision and complete decision trail. |
-| `POST` | `/api/nanda/resolve` | Resolves an agent identifier against the Nanda registry (stub) and returns its verification status and capabilities. |
+| `POST` | `/api/agent/reason` | Extracts structured intent (reason, category, risk flags, budget ceiling) from free text. Informational only. |
+| `POST` | `/api/requests/evaluate` | Full orchestration — intent → Nanda → Senso → `runPolicyEvaluation`. Returns the verdict and complete decision trail. |
+| `POST` | `/api/nanda/resolve` | Resolves an agent identifier against the Nanda registry (stub). |
 | `POST` | `/api/nanda/register-agent` | Registers a new agent with the Nanda registry (stub). |
 | `POST` | `/api/prava/session` | Creates a Prava embedded card-link session for a mandate. |
 | `POST` | `/api/prava/session/[id]/revoke` | Revokes an existing Prava session by ID. |
-| `POST` | `/api/prava/over-cap-session` | Creates a re-authorization session for a purchase above a mandate's normal limit, tied to an existing card enrollment. |
-| `POST` | `/api/linq/send-approval` | Sends an interactive iMessage approval card for an escalated purchase request via Linq. |
-| `POST` | `/api/linq/webhook` | Receives and signature-verifies inbound Linq webhook events (approve/deny decisions from a tapped card). |
+| `POST` | `/api/prava/over-cap-session` | Creates a re-authorization session for spend above a mandate's normal limit. |
+| `POST` | `/api/linq/send-approval` | Sends an interactive iMessage approval card for an escalated request. |
+| `POST` | `/api/linq/webhook` | Verifies and parses inbound Linq webhook events (approve/deny decisions). |
+
+</details>
 
 ## Components
 
-- **`policy/engine.ts` — `runPolicyEvaluation`**: the deterministic core. Evaluates mandate existence, pause state, merchant/category scope, per-charge and daily-limit caps, and card-link status, producing the final verdict and an ordered `DecisionStep[]` trail.
-- **`agent/reason.ts` — `extractIntent`**: wraps an OpenAI-compatible chat completion (Groq by default) to turn free text into structured `ExtractedIntent`, with automatic fallback between models on access errors and detailed, categorized error reporting (auth, rate limit, model access).
-- **`prava/session.ts`**: typed client for creating and revoking Prava embedded card-link sessions, including the over-cap re-authorization variant.
-- **`linq/client.ts` / `linq/webhook.ts`**: sends formatted iMessage approval cards through the Linq Partner API and verifies inbound Standard Webhooks signatures (`webhook-id`.`webhook-timestamp`.`body` HMAC scheme).
-- **`senso/client.ts`**: real integration against Senso's grounded-search API (`X-API-Key` auth), used to surface relevant policy text for a human reviewer without influencing the verdict.
-- **`nanda/client.ts`**: explicitly-labeled stub for agent identity resolution, shaped to be swapped for a real Nanda registry client without touching any calling code.
-- **`components/workspace/*`**: the workspace UI — mandate cards, purchase-request cards, the activity timeline that renders a request's `DecisionStep[]`, the approval drawer, and the audit receipt view.
-- **`components/demo/*`**: the step components (`chat-step`, `reasoning-step`, `policy-step`, `approval-step`, `execution-step`, `receipt-step`) that compose the guided `/demo` walkthrough.
-- **`components/trust-pipeline.tsx`, `workspace-preview.tsx`, `primitives.tsx`, `code-block.tsx`**: marketing-page building blocks for the landing page.
+- **`policy/engine.ts` → `runPolicyEvaluation`** — the deterministic core. Checks mandate existence, pause state, merchant/category scope, per-charge and daily caps, and card-link status; produces the verdict and the full `DecisionStep[]` trail.
+- **`agent/reason.ts` → `extractIntent`** — wraps a Groq/OpenAI chat completion, with automatic model fallback on access errors and categorized error reporting (auth, rate limit, model access).
+- **`prava/session.ts`** — typed client for creating/revoking Prava card-link sessions, including the over-cap variant.
+- **`linq/client.ts` / `linq/webhook.ts`** — sends formatted iMessage approval cards and verifies inbound Standard Webhooks signatures.
+- **`senso/client.ts`** — real integration against Senso's grounded search API, surfacing policy context for reviewers without touching the verdict.
+- **`nanda/client.ts`** — clearly-labeled stub for agent identity resolution, shaped so a real registry client can drop in without touching any caller.
+- **`components/workspace/*`** — mandate cards, request cards, the activity timeline that renders `DecisionStep[]`, the approval drawer, the audit receipt view.
+- **`components/demo/*`** — the composable steps (`chat`, `reasoning`, `policy`, `approval`, `execution`, `receipt`) behind `/demo`.
 
 ## Performance Considerations
 
-- **Turbopack dev server** (`next dev`) for fast local iteration and incremental compilation.
-- **Server Components by default** across the App Router, with `"use client"` scoped only to interactive pieces (forms, animated marketing sections, charts).
-- **`server-only` guards** on every integration module (`prava`, `linq`, `nanda`, `senso`, `agent/reason`), preventing server-only code and secrets from ever being bundled into client JavaScript.
-- **No unnecessary round-trips**: `/api/requests/evaluate` calls `extractIntent` and the policy engine directly in-process rather than making an internal HTTP call to `/api/agent/reason`.
-- **Session-scoped state, not global re-fetching**: mandate spend (`spentToday`) is tracked in client state for the duration of a session, so repeated evaluations against the same mandate don't require re-reading from a data source on every request.
+- **Turbopack** dev server for fast local iteration.
+- **Server Components by default** across the App Router — `"use client"` scoped only to interactive pieces.
+- **`server-only` guards** on every integration module, keeping secrets out of the client bundle entirely.
+- **No redundant round-trips** — `/api/requests/evaluate` calls `extractIntent` and the policy engine in-process rather than hitting `/api/agent/reason` internally.
+- **Session-scoped state** — mandate spend tracking lives in client state for the session rather than being re-fetched per evaluation.
 
 ## Security
 
-- **Secrets stay server-side.** `PRAVA_SECRET_KEY`, `GROQ_API_KEY`/`OPENAI_API_KEY`, `SENSO_API_KEY`, `NANDA_API_KEY`, `LINQ_API_KEY`, and `LINQ_WEBHOOK_SECRET` are only read inside `server-only`-marked modules and Route Handlers; only the client-safe `NEXT_PUBLIC_PRAVA_PUBLISHABLE_KEY` and `NEXT_PUBLIC_APP_URL` are exposed to the browser.
-- **Webhook signature verification.** Inbound Linq webhooks are verified against the Standard Webhooks specification (`verifyLinqWebhookSignature`) using `LINQ_WEBHOOK_SECRET` before any payload is trusted.
-- **Input validation on every route.** Each API route parses and type-checks its JSON body, returning `400` on malformed input before any downstream call is made.
-- **Decision integrity.** The policy engine is intentionally isolated from the LLM extraction step and identity-resolution output — a manipulated or hallucinated model response cannot itself flip an allow/deny verdict.
-- **`.env.local` is git-ignored** by default (see `.gitignore`) — never commit real API keys or the Linq/Prava secrets to version control.
+- **Secrets stay server-side.** Only `NEXT_PUBLIC_PRAVA_PUBLISHABLE_KEY` and `NEXT_PUBLIC_APP_URL` ever reach the browser.
+- **Webhook signature verification** against the Standard Webhooks spec before any Linq payload is trusted.
+- **Input validation** on every route — malformed JSON returns `400` before any downstream call fires.
+- **Decision integrity** — the policy engine is isolated from LLM output and identity-resolution results; a hallucinated model response can't flip a verdict.
+- **`.env.local` is git-ignored** — never commit real keys.
 
-> This is a demo/hackathon-grade app with no authentication or authorization layer of its own (no user login, no per-workspace access control) and no persistent database — treat any deployment as a prototype, not a production financial system, until those are added.
+> [!IMPORTANT]
+> This is demo/hackathon-grade software: no authentication, no per-workspace authorization, no persistent database. Treat any deployment as a prototype until those are added.
 
 ## Development
 
 ```bash
-npm run dev            # Start the Turbopack dev server
+npm run dev            # Turbopack dev server
 npm run build           # Production build
 npm run start            # Serve the production build
-npm run lint              # Run ESLint (eslint-config-next)
-npm run senso:ingest    # Ingest documents into Senso's knowledge base (scripts/senso-ingest.ts)
+npm run lint              # ESLint (eslint-config-next)
+npm run senso:ingest    # Ingest docs into Senso's knowledge base
 ```
 
 ## Deployment
 
-Embassy is a standard Next.js App Router application and deploys cleanly to any Next.js-compatible host (e.g. [Vercel](https://vercel.com)).
+Standard Next.js App Router app — deploys cleanly to any Next.js-compatible host (e.g. [Vercel](https://vercel.com)).
 
-1. Set all required environment variables from the [Configuration](#configuration) table in your hosting provider's dashboard.
-2. Set `NEXT_PUBLIC_APP_URL` to the deployed domain (needed for Prava session redirects and Linq webhook callbacks).
-3. Point your Linq webhook endpoint at `https://<your-domain>/api/linq/webhook` and configure the matching `LINQ_WEBHOOK_SECRET`.
-4. Run `npm run build` followed by `npm run start`, or let your host run these automatically.
+1. Set every required variable from [Configuration](#configuration) in your host's dashboard.
+2. Set `NEXT_PUBLIC_APP_URL` to your deployed domain (Prava redirects, Linq webhook callbacks).
+3. Point your Linq webhook at `https://<your-domain>/api/linq/webhook` with the matching `LINQ_WEBHOOK_SECRET`.
+4. `npm run build && npm run start` — or let your platform run these automatically.
 
-No deployment-platform-specific configuration files (e.g. `vercel.json`) are currently present in the repository — standard Next.js build detection is sufficient on most platforms.
+No platform-specific config files (e.g. `vercel.json`) are currently in the repo; standard Next.js build detection is sufficient on most hosts.
 
 ## Roadmap
 
-- [ ] Persistent storage for mandates, requests, and the audit ledger (replacing in-memory/session state)
+- [ ] Persistent storage for mandates, requests, and the audit ledger
 - [ ] Authentication and per-workspace authorization
-- [ ] Full Nanda integration once a public API/contract is available (replacing the current stub)
-- [ ] Confirm and implement the exact Linq webhook event/payload for card decisions (currently a best-effort parse pending event-catalog confirmation)
-- [ ] Multi-currency support beyond INR display formatting
-- [ ] Webhook-driven real-time updates to the workspace UI (SSE/websocket) instead of client-owned state
+- [ ] Full Nanda integration once a public API contract exists (replacing the current stub)
+- [ ] Confirm the exact Linq webhook event/payload for card decisions
+- [ ] Multi-currency support beyond current INR formatting
+- [ ] Real-time workspace updates (SSE/websocket) instead of client-owned state
 
 ## Contributing
 
-Contributions are welcome. To propose a change:
+1. Fork the repo, branch off `feature/your-feature`.
+2. Keep the policy engine free of side effects and free of any dependency on LLM output — that's the one rule that isn't negotiable.
+3. `npm run lint` and `npm run build` clean before opening a PR.
+4. Describe *why*, not just *what*, in your PR description.
 
-1. Fork the repository and create a feature branch (`git checkout -b feature/your-feature`).
-2. Make your changes, keeping the policy engine's decision logic free of side effects and free of any dependency on LLM output.
-3. Run `npm run lint` and ensure the app builds cleanly with `npm run build`.
-4. Open a pull request with a clear description of the change and, where relevant, the reasoning behind it.
-
-Please avoid introducing new "stub" integrations without clearly labeling them as such (see `src/lib/nanda/client.ts` for the pattern this project follows).
+If you add a new integration you can't fully verify against real docs, label it as a stub the way `src/lib/nanda/client.ts` does — don't let an assumption pass as a contract.
 
 ## License
 
-No license has been added to this repository yet. All rights are reserved by the author unless a license is added.
+No license has been added yet. All rights reserved by the author until one is.
 
 ## Author
 
-**Embassy** was built as a demonstration of policy-gated, auditable agentic commerce.
+Built as a demonstration of policy-gated, auditable agentic commerce.
 
-- Author: _Add your name_
-- Contact: _Add your email or website_
-- GitHub: _Add your GitHub profile link_
+**_Add your name_** · _Add your email or website_ · _Add your GitHub_
+
+<div align="center">
+<sub>Every agent needs a mandate before it crosses the border.</sub>
+</div>
