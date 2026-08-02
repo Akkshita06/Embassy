@@ -70,10 +70,11 @@ export function CardLinkPanel({
   const collectCleanupRef =
     useRef<(() => void) | null>(null);
 
-  const readyTimeoutRef =
-    useRef<ReturnType<typeof setTimeout> | null>(
-      null
-    );
+  // Fixed: typed as `number | null` (the browser `window.setTimeout`
+  // return type) instead of `ReturnType<typeof setTimeout>`, which
+  // resolves to Node's `Timeout` type in this project because
+  // @types/node is installed — that mismatch was breaking `next build`.
+  const readyTimeoutRef = useRef<number | null>(null);
 
   function clearReadyTimeout() {
     if (readyTimeoutRef.current) {
