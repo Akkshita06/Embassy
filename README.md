@@ -391,7 +391,7 @@ No license has been added yet. All rights reserved by the author until one is.
 
 Built as a demonstration of policy-gated, auditable agentic commerce, for the founder running it all alone.
 
-**_Add your name_** · _Add your email or website_ · _Add your GitHub_
+
 
 <div align="center">
   <img src="embassy-logo.png" width="36" alt="" />
