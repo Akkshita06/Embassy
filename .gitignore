@@ -6,3 +6,4 @@ logs/
 .cursor/
 .claude/
 .agents/
+AGENTS.md
